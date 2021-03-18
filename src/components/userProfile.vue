@@ -6,14 +6,31 @@
       <div class="user-profile_follower-count">
         <strong> Followers: </strong>{{ followers }}
       </div>
+      <form class="user-profile_create-twoot" @submit.prevent="createNewTwoot">
+        <label for="newTwoot"><strong>New Twoot</strong></label>
+        <textarea id="newTwoot" rows="6" v-model="newTwootContent"/>
+
+        <div class="user-profile_create-twoot-type">
+          <label for="newTwootType"><strong>Type:</strong></label>
+          <select id="newTwootType" v-model="selectTwootType">
+            <option :value="option.value" v-for="(option,index) in twootTypes" :key="index">
+              {{option.name}}
+            </option>
+          </select>
+        </div>
+      <button > Twoot!</button>
+      </form>
     </div>
     <div class="user-profile_twoots-wrapper">
-        <TwootItem v-for="twoot in user.twoots" :key="twoot.id" :username="user.username" :twoot="twoot" @favourite="toggleFavourite"/>
+        <TwootItem 
+        v-for="twoot in user.twoots" 
+        :key="twoot.id" 
+        :username="user.username" 
+        :twoot="twoot" 
+        @favourite="toggleFavourite"/>
         
-
     </div>
 
-    <button @click="followUser">follow</button>
   </div>
 </template>
 
@@ -25,6 +42,12 @@ export default {
   components:{ TwootItem },
   data() {
     return {
+      newTwootContent: '',
+      selectTwootType: 'instant',//not working
+      twootTypes: [
+        { value: 'draft', name: 'Draft'},
+        { value: 'instant', name:'Instant Twoot'}
+      ],
       followers: 0,
       user: {
         id: 1,
@@ -32,7 +55,7 @@ export default {
         firstName: "Principal",
         lastName: "Kelvo",
         email: "principalkelvo@gmail.com",
-        isAdmin: false,
+        isAdmin: true,
         twoots:[
             {id: 1, content: "Twooter is Amazing!"},
             {id: 2, content: "Dont forget to subscribe"},
@@ -58,7 +81,16 @@ export default {
       this.followers++;
     },
     toggleFavourite(id){
-      console.log(`added to favourite #${id}`)
+      console.log(`favourited twoot #${id}`)
+    },
+    createNewTwoot(){
+      if( this.newTwootContent && this.selectTwootType !== 'draft'){
+        this.user.twoots.unshift({
+          id: this.user.twoots.length + 1,
+          content: this.newTwootContent
+        })
+        this.newTwootContent= "";
+      }
     }
   },
   mounted(){
@@ -96,5 +128,16 @@ export default {
 
 h1 {
   margin: 0;
+}
+
+.user-profile_twoots-wrapper{
+  display: grid;
+  grid-gap:10px;
+}
+
+.user-profile_create-twoot{
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
 }
 </style>
